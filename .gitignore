@@ -1,0 +1,6 @@
+.DS_Store
+*.test
+.idea
+files
+tmp
+*.exe
