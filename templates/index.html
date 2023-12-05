@@ -43,25 +43,30 @@
             <div class="grid-demo">
                 <table class="layui-table" lay-skin="nob">
                     <colgroup>
+                        <col width="50">
                         <col width="40%">
                         <col>
                     </colgroup>
                     <thead>
                     <tr>
-                        <th>文件位置</th>
+                        <th>缩略图</th>
+                        <th>文件名</th>
                         <th>操作</th>
                     </tr>
                     </thead>
                     <tbody>
+
                     {{ range .files}}
                         <tr>
+                            <td><img src="/{{.}}" onclick="previewImg({{.}})" style="border-radius: 2px;width: 35px;padding: 5px;"/></td>
                             <td>{{.}}</td>
                             <td>
-                                <a href="/download?filename={{.}}" class="layui-btn layui-btn-xs layui-btn-primary layui-border-blue">下载</a>
+                                <a class="layui-btn layui-btn-xs layui-btn-primary layui-border-blue" onclick="downloadFile({{.}})">下载</a>
                                 <a class="layui-btn layui-btn-xs layui-btn-primary layui-border-red" onclick="delFile({{.}})">删除</a>
                             </td>
                         </tr>
                     {{ end }}
+
                     </tbody>
                 </table>
             </div>
@@ -145,6 +150,21 @@
             }
         });
     });
+
+    function previewImg(filename) {
+        layer.open({
+            type: 5,
+            title: false,
+            closeBtn: 0,
+            shadeClose: true,
+            area: ['auto', 'auto'],
+            content: "<img src='/" + filename + "' style='width:100%; max-width: 750px; height:100%; max-height: 750px;' />",
+        });
+    }
+
+    function downloadFile(filename) {
+        window.location.href = '/download?filename=' + filename
+    }
 
     function delFile(filename) {
         console.log(filename)

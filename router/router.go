@@ -16,6 +16,7 @@ import (
 func InitRouter(e *gin.Engine) {
 	e.LoadHTMLGlob("templates/*.html")
 	e.Static("/assets", "./assets")
+	e.Static("/files", "./files")
 
 	e.GET("/", func(c *gin.Context) {
 		files, err := filepath.Glob(filepath.Join(config.FileStorage, "*"))
@@ -25,7 +26,7 @@ func InitRouter(e *gin.Engine) {
 
 		var links []string
 		for _, file := range files {
-			links = append(links, strings.TrimPrefix(file, config.FileStorage+"/"))
+			links = append(links, strings.Replace(strings.TrimPrefix(file, config.FileStorage+"/"), "\\", "/", -1))
 		}
 
 		c.HTML(http.StatusOK, "index.html", gin.H{
