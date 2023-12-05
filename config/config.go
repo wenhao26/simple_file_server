@@ -5,10 +5,10 @@ import (
 )
 
 var (
-	LogFile    string
-	LogConsole bool
-	LogLevel   string
-
+	LogFile     string
+	LogConsole  bool
+	LogLevel    string
+	ServerPort  string
 	FileStorage string
 )
 
@@ -16,6 +16,7 @@ func init() {
 	LogFile = "runtime/logs/server.log"
 	LogConsole = true
 	LogLevel = "debug"
+	ServerPort = "8089"
 	FileStorage = fileStorage()
 }
 

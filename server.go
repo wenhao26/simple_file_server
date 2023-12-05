@@ -29,7 +29,7 @@ func main() {
 
 func start() error {
 	s := &http.Server{
-		Addr:    ":8899",
+		Addr:    ":" + config.ServerPort,
 		Handler: ginEngine(),
 	}
 
