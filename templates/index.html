@@ -9,30 +9,68 @@
 </head>
 <body>
 <div style="margin: 50px auto;width: 1098px;">
-    <div class="layui-upload">
-        <button type="button" class="layui-btn layui-btn-normal" id="ID-upload-demo-files">选择多文件</button>
-        <div class="layui-upload-list">
-            <table class="layui-table">
-                <colgroup>
-                    <col style="min-width: 100px;">
-                    <col width="150">
-                    <col width="260">
-                    <col width="150">
-                </colgroup>
-                <thead>
-                <th>文件名</th>
-                <th>大小</th>
-                <th>上传进度</th>
-                <th>操作</th>
-                </thead>
-                <tbody id="ID-upload-demo-files-list"></tbody>
-            </table>
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>文件上传</legend>
+    </fieldset>
+    <div class="grid-demo grid-demo-bg1">
+        <div class="layui-upload">
+            <button type="button" class="layui-btn layui-btn-normal" id="ID-upload-demo-files">选择多文件</button>
+            <div class="layui-upload-list">
+                <table class="layui-table">
+                    <colgroup>
+                        <col style="min-width: 100px;">
+                        <col width="150">
+                        <col width="260">
+                        <col width="150">
+                    </colgroup>
+                    <thead>
+                    <th>文件名</th>
+                    <th>大小</th>
+                    <th>上传进度</th>
+                    <th>操作</th>
+                    </thead>
+                    <tbody id="ID-upload-demo-files-list"></tbody>
+                </table>
+            </div>
+            <button type="button" class="layui-btn" id="ID-upload-demo-files-action">开始上传</button>
         </div>
-        <button type="button" class="layui-btn" id="ID-upload-demo-files-action">开始上传</button>
+    </div>
+    <div class="layui-row" style="margin-top: 50px;">
+        <fieldset class="layui-elem-field layui-field-title">
+            <legend>文件列表</legend>
+        </fieldset>
+        <div class="layui-col-xs" style="height: 450px;overflow-y: auto;">
+            <div class="grid-demo">
+                <table class="layui-table" lay-skin="nob">
+                    <colgroup>
+                        <col width="40%">
+                        <col>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>文件位置</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{ range .files}}
+                        <tr>
+                            <td>{{.}}</td>
+                            <td>
+                                <a href="/download?filename={{.}}" class="layui-btn layui-btn-xs layui-btn-primary layui-border-blue">下载</a>
+                                <a class="layui-btn layui-btn-xs layui-btn-primary layui-border-red" onclick="delFile({{.}})">删除</a>
+                            </td>
+                        </tr>
+                    {{ end }}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- 请勿在项目正式环境中引用该 layui.js 地址 -->
+<script src="/assets/jquery-3.7.1.min.js"></script>
 <script src="/assets/layui/layui.js"></script>
 <script>
     layui.use(function () {
@@ -83,13 +121,13 @@
             },
             done: function (res, index, upload) { // 成功的回调
                 var that = this;
-                if(res.code == 0){ // 上传成功
-                    var tr = that.elemList.find('tr#upload-' + index)
-                    var tds = tr.children();
-                    tds.eq(3).html(''); // 清空操作
-                    delete this.files[index]; // 删除文件队列已经上传成功的文件
-                    return;
-                }
+                //if (res.code == 0) { // 上传成功
+                var tr = that.elemList.find('tr#upload-' + index)
+                var tds = tr.children();
+                tds.eq(3).html(''); // 清空操作
+                delete this.files[index]; // 删除文件队列已经上传成功的文件
+                return;
+                //}
                 this.error(index, upload);
             },
             allDone: function (obj) { // 多文件上传完毕后的状态回调
@@ -107,6 +145,49 @@
             }
         });
     });
+
+    function delFile(filename) {
+        console.log(filename)
+
+        layer.confirm('确定删除文件:' + filename + '?', {
+            btn: ['确定', '关闭'] //按钮
+        }, function () {
+            $.ajax({
+                url: '/delete',
+                type: 'post',
+                dataType: 'json',
+                data: {filename: filename},
+                beforeSend: function () {
+                    loading = layer.msg('处理中...', {
+                        icon: 16
+                        , shade: 0.1
+                        , time: false
+                    });
+                },
+                success: function (e) {
+                    if (e.code == 0) {
+                        layer.close(loading);
+                        layer.msg('删除成功', {icon: 1, time: 1200}, function () {
+                            window.location.reload();
+                        });
+                    } else {
+                        layer.msg(e.msg, {icon: 5, shift: 6});
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    layer.close(loading);
+                    layer.msg(XMLHttpRequest.readyState + XMLHttpRequest.status + XMLHttpRequest.responseText, {
+                        icon: 2,
+                        time: 3000
+                    });
+                },
+                complete: function () {
+                }
+            });
+
+        }, function () {
+        });
+    }
 </script>
 
 </body>
