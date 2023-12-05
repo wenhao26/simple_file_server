@@ -26,7 +26,8 @@ func InitRouter(e *gin.Engine) {
 
 		var links []string
 		for _, file := range files {
-			links = append(links, strings.Replace(strings.TrimPrefix(file, config.FileStorage+"/"), "\\", "/", -1))
+			//links = append(links, strings.Replace(strings.TrimPrefix(file, config.FileStorage+"/"), "\\", "/", -1))
+			links = append(links, strings.Replace(file, "\\", "/", -1))
 		}
 
 		c.HTML(http.StatusOK, "index.html", gin.H{
